@@ -7,6 +7,9 @@ use std::{
     sync::Arc,
 };
 
+//#[macro_use]
+//extern crate derive_error;
+
 extern crate anyhow;
 use anyhow::{anyhow, Result};
 use futures::{StreamExt, TryFutureExt};
@@ -17,6 +20,7 @@ use tracing_futures::Instrument as _;
 use tokio::prelude::*;
 
 mod security;
+mod request;
 
 extern crate common;
 
@@ -48,6 +52,8 @@ fn main() {
             .finish(),
     ).unwrap();
 
+    
+
     let mut rt = tokio::runtime::Builder::new()
         .threaded_scheduler()
         .enable_all()
@@ -68,6 +74,7 @@ fn main() {
 
 //#[tokio::main]
 async fn run(options: Opt) -> Result<()> {
+
     let mut transport_config = quinn::TransportConfig::default();
     transport_config.stream_window_uni(0);
     let mut server_config = quinn::ServerConfig::default();
@@ -160,11 +167,14 @@ async fn handle_request((mut send, recv): (quinn::SendStream, quinn::RecvStream)
         .await
         .map_err(|e| anyhow!("Failed reading request: {}", e))?;
 
-    use std::convert::TryFrom;
-    let test = broker_proto::Protocol::try_from(&req[..]).unwrap();
-    let escaped = format!("{:#?}", test);
 
-    info!(content = %escaped);
+    let req = request::handle_request(req).await?;
+
+    //use std::convert::TryFrom;
+    //let test = broker_proto::Protocol::try_from(&req[..]).unwrap();
+    //let escaped = format!("{:#?}", test);
+
+    //info!(content = %escaped);
 
     send.write_all(&req)
         .await
