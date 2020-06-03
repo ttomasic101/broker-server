@@ -16,6 +16,9 @@ use rmp_serde::{Deserializer, Serializer};
 extern crate serde;
 extern crate rmp_serde as rmps;
 
+#[allow(unused_imports)]
+use bollard::container::*;
+
 /*
 #[derive(Debug, Error)]
 enum ProtocolError {
@@ -65,129 +68,186 @@ pub async fn handle_request(buf: Vec<u8>) -> Result<Vec<u8>> {
                     
                 },
                 broker_proto::CommandType::Change => {
-                    if let None = cmd.name {
-                        Protocol::error_none("No name parameter given")
-                    } else {
-                        match get_container_changes(&docker, &cmd.name.unwrap()).await {
-                            Ok(res) => res,
-                            Err(e) => Protocol::error_none(&e.to_string())
+
+                    if let Some(arg) = cmd.argument {
+                        if let broker_proto::Arguments::ContainerChanges{name} = arg {
+                            match get_container_changes(&docker, &name).await {
+                                Ok(res) => res,
+                                Err(e) => Protocol::error_none(&e.to_string())
+                            }
+                        } else {
+                            Protocol::error_none("Invalid argument.")
                         }
+                    } else {
+                        Protocol::error_none("No parameter received.")
                     }
-                    
                 },
                 broker_proto::CommandType::Container => {
-                    if let None = cmd.name {
-                        Protocol::error_none("No name parameter given")
-                    } else {
-                        match inspect_container(&docker, &cmd.name.unwrap()).await {
-                            Ok(res) => res,
-                            Err(e) => Protocol::error_none(&e.to_string())
+                    if let Some(arg) = cmd.argument {
+                        if let broker_proto::Arguments::InspectContainer{name, options} = arg {
+                            match inspect_container(&docker, &name, options).await {
+                                Ok(res) => res,
+                                Err(e) => Protocol::error_none(&e.to_string())
+                            }
+                        } else {
+                            Protocol::error_none("Invalid argument.")
                         }
+                    } else {
+                        Protocol::error_none("No parameter received.")
                     }
                 },
                 broker_proto::CommandType::Stats => {
-                    if let None = cmd.name {
-                        Protocol::error_none("No name parameter given")
-                    } else {
-                        match get_stats(&docker, &cmd.name.unwrap()).await {
-                            Ok(res) => res,
-                            Err(e) => Protocol::error_none(&e.to_string())
+                    if let Some(arg) = cmd.argument {
+                        if let broker_proto::Arguments::Stats{name, options} = arg {
+                            match get_stats(&docker, &name, options).await {
+                                Ok(res) => res,
+                                Err(e) => Protocol::error_none(&e.to_string())
+                            }
+                        } else {
+                            Protocol::error_none("Invalid argument.")
                         }
+                    } else {
+                        Protocol::error_none("No parameter received.")
                     }
                 },
                 broker_proto::CommandType::Top => {
-                    if let None = cmd.name {
-                        Protocol::error_none("No name parameter given")
-                    } else {
-                        match container_top(&docker, &cmd.name.unwrap()).await {
-                            Ok(res) => res,
-                            Err(e) => Protocol::error_none(&e.to_string())
+                    if let Some(arg) = cmd.argument {
+                        if let broker_proto::Arguments::Top{name, options} = arg {
+                            match container_top(&docker, &name, options).await {
+                                Ok(res) => res,
+                                Err(e) => Protocol::error_none(&e.to_string())
+                            }
+                        } else {
+                            Protocol::error_none("Invalid argument.")
                         }
+                    } else {
+                        Protocol::error_none("No parameter received.")
                     }
                 },
                 broker_proto::CommandType::Log => {
-                    if let None = cmd.name {
-                        Protocol::error_none("No name parameter given")
-                    } else {
-                        match get_logs(&docker, &cmd.name.unwrap()).await {
-                            Ok(res) => res,
-                            Err(e) => Protocol::error_none(&e.to_string())
+                    if let Some(arg) = cmd.argument {
+                        if let broker_proto::Arguments::Logs{name, options} = arg {
+                            match get_logs(&docker, &name, options).await {
+                                Ok(res) => res,
+                                Err(e) => Protocol::error_none(&e.to_string())
+                            }
+                        } else {
+                            Protocol::error_none("Invalid argument.")
                         }
+                    } else {
+                        Protocol::error_none("No parameter received.")
                     }
                 },
                 broker_proto::CommandType::Stop => {
-                    if let None = cmd.name {
-                        Protocol::error_none("No name parameter given")
-                    } else {
-                        match stop_container(&docker, &cmd.name.unwrap()).await {
-                            Ok(res) => res,
-                            Err(e) => Protocol::error_none(&e.to_string())
+                    if let Some(arg) = cmd.argument {
+                        if let broker_proto::Arguments::Stop{name, options} = arg {
+                            match stop_container(&docker, &name, options).await {
+                                Ok(res) => res,
+                                Err(e) => Protocol::error_none(&e.to_string())
+                            }
+                        } else {
+                            Protocol::error_none("Invalid argument.")
                         }
+                    } else {
+                        Protocol::error_none("No parameter received.")
                     }
                 },
                 broker_proto::CommandType::Start => {
-                    if let None = cmd.name {
-                        Protocol::error_none("No name parameter given")
-                    } else {
-                        match start_container(&docker, &cmd.name.unwrap()).await {
-                            Ok(res) => res,
-                            Err(e) => Protocol::error_none(&e.to_string())
+                    if let Some(arg) = cmd.argument {
+                        if let broker_proto::Arguments::Start{name, options} = arg {
+                            match start_container(&docker, &name, options).await {
+                                Ok(res) => res,
+                                Err(e) => Protocol::error_none(&e.to_string())
+                            }
+                        } else {
+                            Protocol::error_none("Invalid argument.")
                         }
+                    } else {
+                        Protocol::error_none("No parameter received.")
                     }
                 },
                 broker_proto::CommandType::Kill => {
-                    if let None = cmd.name {
-                        Protocol::error_none("No name parameter given")
-                    } else {
-                        match kill_container(&docker, &cmd.name.unwrap()).await {
-                            Ok(res) => res,
-                            Err(e) => Protocol::error_none(&e.to_string())
+                    if let Some(arg) = cmd.argument {
+                        if let broker_proto::Arguments::Kill{name, options} = arg {
+                            match kill_container(&docker, &name, options).await {
+                                Ok(res) => res,
+                                Err(e) => Protocol::error_none(&e.to_string())
+                            }
+                        } else {
+                            Protocol::error_none("Invalid argument.")
                         }
+                    } else {
+                        Protocol::error_none("No parameter received.")
                     }
                 },
                 broker_proto::CommandType::Restart => {
-                    if let None = cmd.name {
-                        Protocol::error_none("No name parameter given")
-                    } else {
-                        match restart_container(&docker, &cmd.name.unwrap()).await {
-                            Ok(res) => res,
-                            Err(e) => Protocol::error_none(&e.to_string())
+                    if let Some(arg) = cmd.argument {
+                        if let broker_proto::Arguments::Restart{name, options} = arg {
+                            match restart_container(&docker, &name, options).await {
+                                Ok(res) => res,
+                                Err(e) => Protocol::error_none(&e.to_string())
+                            }
+                        } else {
+                            Protocol::error_none("Invalid argument.")
                         }
+                    } else {
+                        Protocol::error_none("No parameter received.")
                     }
                 },
                 broker_proto::CommandType::Prune => {
-
-                    match prune_container(&docker).await {
-                        Ok(res) => res,
-                        Err(e) => Protocol::error_none(&e.to_string())
+                    if let Some(arg) = cmd.argument {
+                        if let broker_proto::Arguments::Prune{options} = arg {
+                            match prune_container(&docker, options).await {
+                                Ok(res) => res,
+                                Err(e) => Protocol::error_none(&e.to_string())
+                            }
+                        } else {
+                            Protocol::error_none("Invalid argument.")
+                        }
+                    } else {
+                        Protocol::error_none("No parameter received.")
                     }
-                    
                 },
                 broker_proto::CommandType::Remove => {
-                    if let None = cmd.name {
-                        Protocol::error_none("No name parameter given")
-                    } else {
-                        match remove_container(&docker, &cmd.name.unwrap()).await {
-                            Ok(res) => res,
-                            Err(e) => Protocol::error_none(&e.to_string())
+                    if let Some(arg) = cmd.argument {
+                        if let broker_proto::Arguments::Remove{name, options} = arg {
+                            match remove_container(&docker, &name, options).await {
+                                Ok(res) => res,
+                                Err(e) => Protocol::error_none(&e.to_string())
+                            }
+                        } else {
+                            Protocol::error_none("Invalid argument.")
                         }
+                    } else {
+                        Protocol::error_none("No parameter received.")
                     }
                 },
                 broker_proto::CommandType::Update => {
-                    if let None = cmd.name {
-                        Protocol::error_none("No name parameter given")
-                    } else {
-                        match update_container(&docker, &cmd.name.unwrap()).await {
-                            Ok(res) => res,
-                            Err(e) => Protocol::error_none(&e.to_string())
+                    if let Some(arg) = cmd.argument {
+                        if let broker_proto::Arguments::Update{name, options} = arg {
+                            match update_container(&docker, &name, options).await {
+                                Ok(res) => res,
+                                Err(e) => Protocol::error_none(&e.to_string())
+                            }
+                        } else {
+                            Protocol::error_none("Invalid argument.")
                         }
+                    } else {
+                        Protocol::error_none("No parameter received.")
                     }
                 },
                 broker_proto::CommandType::Create => {
-
-                    match create_container(&docker).await {
-                        Ok(res) => res,
-                        Err(e) => Protocol::error_none(&e.to_string())
+                    if let Some(arg) = cmd.argument {
+                        if let broker_proto::Arguments::Create{config, options} = arg {
+                            match create_container(&docker, config, options).await {
+                                Ok(res) => res,
+                                Err(e) => Protocol::error_none(&e.to_string())
+                            }
+                        } else {
+                            Protocol::error_none("Invalid argument.")
+                        }
+                    } else {
+                        Protocol::error_none("No parameter received.")
                     }
                 },
                 _ => Protocol::error_none("Not implemented"),
@@ -207,16 +267,13 @@ pub async fn handle_request(buf: Vec<u8>) -> Result<Vec<u8>> {
 }
 
 async fn list_containers(docker: &Docker) -> Result<Protocol> {
-    let containers: &Vec<bollard::container::APIContainers> = &docker.list_containers(
+    let containers = docker.list_containers(
         Some(bollard::container::ListContainersOptions::<String>{
             all: true,
             ..Default::default()
     })).await?;
 
-    let containers = containers
-        .iter()
-        .map(|el| broker_proto::ContainerList{0: el.clone()})
-        .collect::<Vec<_>>();
+  
 
     let mut proto = Protocol::response(&docker).await?;
     proto.body = broker_proto::Body::ContainerList(containers);
@@ -225,47 +282,33 @@ async fn list_containers(docker: &Docker) -> Result<Protocol> {
 }
 
 async fn get_container_changes(docker: &Docker, name: &str) -> Result<Protocol> {
-    let containers = &docker.container_changes(name).await?;
+    let containers = docker.container_changes(name).await?;
 
-    let output = if let Some(changes) = containers {
-        Some(changes
-            .iter()
-            .map(|el| broker_proto::Change{0: el.clone()})
-            .collect::<Vec<_>>())
-    } else {
-        None
-    };
+    
 
     let mut proto = Protocol::response(&docker).await?;
-    proto.body = broker_proto::Body::Change(output);
+    proto.body = broker_proto::Body::Change(containers);
 
     Ok(proto)
 }
 
-async fn inspect_container(docker: &Docker, name: &str) -> Result<Protocol> {
+async fn inspect_container(docker: &Docker, name: &str, opt: Option<InspectContainerOptions>) -> Result<Protocol> {
     let containers = docker
-        .inspect_container(name, None::<bollard::container::InspectContainerOptions>)
+        .inspect_container(name, opt)
         .await?;
 
     let mut proto = Protocol::response(&docker).await?;
-    proto.body = broker_proto::Body::Container(broker_proto::Container{0: containers});
+    proto.body = broker_proto::Body::Container(containers);
 
     Ok(proto)
 }
 
-async fn get_stats(docker: &Docker, name: &str) -> Result<Protocol> {
+async fn get_stats(docker: &Docker, name: &str, opt: Option<StatsOptions>) -> Result<Protocol> {
     let containers = docker
-        .stats(name, Some(bollard::container::StatsOptions {
-            stream: false
-        }))
+        .stats(name, opt)
         .take(1)
         .try_collect::<Vec<_>>()
         .await?;
-
-    let containers = containers
-        .iter()
-        .map(|el| broker_proto::Stats{0: el.clone()})
-        .collect::<Vec<_>>();
 
     let mut proto = Protocol::response(&docker).await?;
     proto.body = broker_proto::Body::Stats(containers);
@@ -273,43 +316,23 @@ async fn get_stats(docker: &Docker, name: &str) -> Result<Protocol> {
     Ok(proto)
 }
 
-async fn container_top(docker: &Docker, name: &str) -> Result<Protocol> {
+async fn container_top(docker: &Docker, name: &str, opt: Option<TopOptions<String>>) -> Result<Protocol> {
     let containers = docker
-        .top_processes(name, Some(bollard::container::TopOptions{
-            ps_args: "aux"
-        }))
+        .top_processes(name, opt)
         .await?;
 
     let mut proto = Protocol::response(&docker).await?;
-    proto.body = broker_proto::Body::TopResult(broker_proto::TopResult{0: containers});
+    proto.body = broker_proto::Body::TopResult(containers);
 
     Ok(proto)
 }
 
-async fn get_logs(docker: &Docker, name: &str) -> Result<Protocol> {
+async fn get_logs(docker: &Docker, name: &str, opt: Option<LogsOptions>) -> Result<Protocol> {
     let containers = docker
-        .logs(name, Some(bollard::container::LogsOptions {
-            follow: false,
-            stdout: true,
-            stderr: true,
-            tail: String::from("all"),
-            ..Default::default()
-        }))
+        .logs(name, opt)
         //.take(1)
         .try_collect::<Vec<_>>()
         .await?;
-
-    let containers = containers
-        .iter()
-        .map(|el| {
-            match el {
-                bollard::container::LogOutput::Console{message:msg} => broker_proto::LogOutputWrapper::Console {message: msg.clone()},
-                bollard::container::LogOutput::StdIn{message:msg} => broker_proto::LogOutputWrapper::StdIn {message: msg.clone()},
-                bollard::container::LogOutput::StdErr{message:msg} => broker_proto::LogOutputWrapper::StdErr {message: msg.clone()},
-                bollard::container::LogOutput::StdOut{message:msg} => broker_proto::LogOutputWrapper::StdOut {message: msg.clone()}
-            }
-        })
-        .collect::<Vec<_>>();
 
     let mut proto = Protocol::response(&docker).await?;
     proto.body = broker_proto::Body::LogOutput(containers);
@@ -317,94 +340,63 @@ async fn get_logs(docker: &Docker, name: &str) -> Result<Protocol> {
     Ok(proto)
 }
 
-async fn stop_container(docker: &Docker, name: &str) -> Result<Protocol> {
+async fn stop_container(docker: &Docker, name: &str, opt: Option<StopContainerOptions>) -> Result<Protocol> {
     docker
-        .stop_container(name, Some(bollard::container::StopContainerOptions {
-            t: 32
-    })).await?;
+        .stop_container(name, opt).await?;
 
     Ok(Protocol::response(&docker).await?)
 }
 
-async fn start_container(docker: &Docker, name: &str) -> Result<Protocol> {
+async fn start_container(docker: &Docker, name: &str, opt: Option<StartContainerOptions<String>>) -> Result<Protocol> {
     docker
-        .start_container(name, Some(bollard::container::StartContainerOptions {
-            detach_keys: "ctrl-^"
-        })).await?;
+        .start_container(name, opt).await?;
 
     Ok(Protocol::response(&docker).await?)
 }
 
-async fn kill_container(docker: &Docker, name: &str) -> Result<Protocol> {
+async fn kill_container(docker: &Docker, name: &str, opt: Option<KillContainerOptions<String>>) -> Result<Protocol> {
     docker
-        .kill_container(name, Some(bollard::container::KillContainerOptions {
-            signal: "SIGINT",
-        })).await?;
+        .kill_container(name, opt).await?;
 
     Ok(Protocol::response(&docker).await?)
 }
 
-async fn restart_container(docker: &Docker, name: &str) -> Result<Protocol> {
+async fn restart_container(docker: &Docker, name: &str, opt: Option<RestartContainerOptions>) -> Result<Protocol> {
     docker
-        .restart_container(name, Some(bollard::container::RestartContainerOptions {
-            t: 30,
-        })).await?;
+        .restart_container(name, opt).await?;
 
     Ok(Protocol::response(&docker).await?)
 }
 
-async fn prune_container(docker: &Docker) -> Result<Protocol> {
-    use std::collections::HashMap;
-
-    let mut filters = HashMap::new();
-    filters.insert("until", vec!("10m"));
-
-    let res = docker.prune_containers(Some(bollard::container::PruneContainersOptions {
-        filters: filters
-    }))
+async fn prune_container(docker: &Docker, opt: Option<PruneContainersOptions<String>>) -> Result<Protocol> {
+    let res = docker.prune_containers(opt)
     .await?;
 
     let mut proto = Protocol::response(&docker).await?;
-    proto.body = broker_proto::Body::PrunedContainers(broker_proto::PruneContainerResults {0: res});
+    proto.body = broker_proto::Body::PrunedContainers(res);
 
     Ok(proto)
 }
 
-async fn remove_container(docker: &Docker, name: &str) -> Result<Protocol> {
+async fn remove_container(docker: &Docker, name: &str, opt: Option<RemoveContainerOptions>) -> Result<Protocol> {
     docker
-        .remove_container(name, Some(bollard::container::RemoveContainerOptions {
-            force: true,
-            ..Default::default()
-    })).await?;
+        .remove_container(name, opt).await?;
 
     Ok(Protocol::response(&docker).await?)
 }
 
-async fn update_container(docker: &Docker, name: &str) -> Result<Protocol> {
+async fn update_container(docker: &Docker, name: &str, opt: UpdateContainerOptions) -> Result<Protocol> {
     docker
-        .update_container(name, bollard::container::UpdateContainerOptions {
-            memory: Some(314572800),
-            memory_swap: Some(314572800),
-            ..Default::default()
-    }).await?;
+        .update_container(name, opt).await?;
 
     Ok(Protocol::response(&docker).await?)
 }
 
-async fn create_container(docker: &Docker) -> Result<Protocol> {
-    let options = Some(bollard::container::CreateContainerOptions{
-        name: "my-new-container",
-    });
+async fn create_container(docker: &Docker, config: Config<String>, opt: Option<CreateContainerOptions<String>>) -> Result<Protocol> {
 
-    let config = bollard::container::Config {
-        image: Some("hello-world"),
-        cmd: Some(vec!["/hello"]),
-        ..Default::default()
-    };
-
-    let res = docker.create_container(options, config).await?;
+    let res = docker.create_container(opt, config).await?;
     let mut proto = Protocol::response(&docker).await?;
-    proto.body = broker_proto::Body::CreateContainerResults(broker_proto::CreateContainerResults{0: res});
+    proto.body = broker_proto::Body::CreateContainerResults(res);
 
     Ok(proto)
 }

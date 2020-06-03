@@ -23,6 +23,7 @@ broker-proto = { path = "../broker-proto", version = "0.1.0"}
 rmp-serde = "0.14.3"
 serde = "1.0.110"
 serde_derive = "1.0.110"
-bollard = "0.5.1"
+
 futures-util = "0.3.5"
 derive-error = "0.0.4"
+bollard = { version = "0.5.1", git = "https://github.com/ttomasic101/bollard" }
